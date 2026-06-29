@@ -466,7 +466,13 @@ def render_question(question, q_type, q_index, chapter, saved_answers):
     expander_expanded = has_answered and is_choice_question
     
     with st.expander("📝 查看答案", expanded=expander_expanded):
-        st.markdown(f"<div class='answer-box'><strong>✅ 答案：</strong>{question['answer']}</div>", unsafe_allow_html=True)
+    # 判断是否为编程题或简答题（包含代码的题目）
+        if q_type in ["编程题", "进阶编程题"]:
+        # 使用 st.code 显示代码，保留换行并高亮
+            st.code(question['answer'], language="java")
+        else:
+        # 其他题型使用普通文本
+            st.markdown(f"<div class='answer-box'><strong>✅ 答案：</strong>{question['answer']}</div>", unsafe_allow_html=True)
         
         # AI解析按钮
         if st.button(f"🤖 AI解析", key=f"ai_{chapter}_{q_type}_{q_index}"):
