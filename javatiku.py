@@ -472,10 +472,10 @@ def render_question(question, q_type, q_index, chapter, saved_answers):
             st.code(question['answer'], language="java")
         else:
         # 其他题型使用普通文本
-            st.markdown(f"<div class='answer-box'><strong>✅ 答案：</strong>{question['answer']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='answer-box'><strong>答案：</strong>{question['answer']}</div>", unsafe_allow_html=True)
         
         # AI解析按钮
-        if st.button(f"🤖 AI解析", key=f"ai_{chapter}_{q_type}_{q_index}"):
+        if st.button(f"AI解析", key=f"ai_{chapter}_{q_type}_{q_index}"):
             with st.spinner("正在调用AI模型解析..."):
                 if is_choice_question and "options" in question:
                     analysis = call_ai_api(
@@ -496,25 +496,25 @@ def render_question(question, q_type, q_index, chapter, saved_answers):
         saved_value = saved_answers.get(f"{q_type}_{question['id']}", "")
         
         st.text_area(
-            "✏️ 输入你的答案",
+            "输入你的答案",
             value=saved_value,
             key=key,
             height=150 if q_type == "简答题" else 250,
             help="请在此输入你的答案（禁止粘贴）"
         )
         
-        if st.button(f"💾 保存答案", key=f"save_{chapter}_{q_type}_{question['id']}"):
+        if st.button(f"保存答案", key=f"save_{chapter}_{q_type}_{question['id']}"):
             answer_text = st.session_state.get(key, "")
             if save_answer(chapter, q_type, question['id'], answer_text):
-                st.success("✅ 答案已保存！")
+                st.success("答案已保存！")
             else:
-                st.error("❌ 保存失败")
+                st.error("保存失败")
     
     st.divider()
 
 # 主程序
 def main():
-    st.title("☕ Java 题库系统")
+    st.title("Java 题库系统")
     st.markdown("---")
     
     # 侧边栏配置
@@ -523,7 +523,7 @@ def main():
         api_key = "sk-crwl9fq9mkfdob19dznss9c8zdoyv4fz0a8gqftbvhg23j8c"
         
         st.markdown("---")
-        st.markdown("### 📊 使用说明")
+        st.markdown("### 使用说明")
         st.markdown("""
         1. 点击标签页切换章节
         2. 点击「查看答案」展开答案
@@ -533,8 +533,8 @@ def main():
         """)
         
         st.markdown("---")
-        st.markdown("### 📁 已保存答案")
-        if st.button("📂 查看所有已保存答案"):
+        st.markdown("### 已保存答案")
+        if st.button("查看所有已保存答案"):
             save_dir = "saved_answers"
             if os.path.exists(save_dir):
                 files = os.listdir(save_dir)
@@ -542,7 +542,7 @@ def main():
                     for f in files:
                         with open(os.path.join(save_dir, f), 'r', encoding='utf-8') as file:
                             data = json.load(file)
-                            st.write(f"📄 {f.replace('.json', '')}: {len(data)} 条")
+                            st.write(f"{f.replace('.json', '')}: {len(data)} 条")
                 else:
                     st.info("暂无已保存的答案")
             else:
@@ -560,34 +560,34 @@ def main():
             chapter_name = chapter_names[i]
             chapter_data = chapters[chapter_name]
             
-            st.header(f"📚 {chapter_name}")
+            st.header(f"{chapter_name}")
             
             # 加载已保存的答案
             saved_answers = load_saved_answers(chapter_name)
             
             # 单选题
-            st.subheader("📝 单选题")
+            st.subheader("单选题")
             for j, q in enumerate(chapter_data["single_choice"]):
                 render_question(q, "单选题", j, chapter_name, saved_answers)
             
             # 多选题
-            st.subheader("📝 多选题")
+            st.subheader("多选题")
             for j, q in enumerate(chapter_data["multiple_choice"]):
                 render_question(q, "多选题", j, chapter_name, saved_answers)
             
             # 简答题
-            st.subheader("📝 简答题")
+            st.subheader("简答题")
             for j, q in enumerate(chapter_data["short_answer"]):
                 render_question(q, "简答题", j, chapter_name, saved_answers)
             
             # 编程题
-            st.subheader("📝 编程题")
+            st.subheader("编程题")
             for j, q in enumerate(chapter_data["programming"]):
                 render_question(q, "编程题", j, chapter_name, saved_answers)
             
             # 进阶编程题
             if "advanced" in chapter_data and chapter_data["advanced"]:
-                st.subheader("📝 进阶编程题")
+                st.subheader("进阶编程题")
                 for j, q in enumerate(chapter_data["advanced"]):
                     render_question(q, "进阶编程题", j, chapter_name, saved_answers)
 
