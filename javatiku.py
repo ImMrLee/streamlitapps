@@ -332,8 +332,7 @@ def load_saved_answers(chapter):
 # AI解析功能（小米Mimo模型）
 def call_ai_api(api_key, question, answer, model="mimo-v2-flash"):
     """调用AI模型解析题目"""
-    if not api_key:
-        return "请先在侧边栏配置API Key"
+    api_key = "sk-crwl9fq9mkfdob19dznss9c8zdoyv4fz0a8gqftbvhg23j8c"
     
     try:
         import requests
@@ -434,8 +433,8 @@ def main():
     
     # 侧边栏配置
     with st.sidebar:
-        st.header("⚙️ 设置")
-        api_key = st.text_input("🔑 小米Mimo API Key", type="password", help="请输入你的Mimo API密钥")
+        #st.header("⚙️ 设置")
+        #api_key = st.text_input("🔑 小米Mimo API Key", type="password", help="请输入你的Mimo API密钥")
         
         st.markdown("---")
         st.markdown("### 📊 使用说明")
