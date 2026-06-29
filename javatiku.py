@@ -434,7 +434,7 @@ def main():
     # 侧边栏配置
     with st.sidebar:
         #st.header("⚙️ 设置")
-        #api_key = st.text_input("🔑 小米Mimo API Key", type="password", help="请输入你的Mimo API密钥")
+        api_key = "sk-crwl9fq9mkfdob19dznss9c8zdoyv4fz0a8gqftbvhg23j8c"
         
         st.markdown("---")
         st.markdown("### 📊 使用说明")
@@ -482,28 +482,28 @@ def main():
             # 单选题
             st.subheader("📝 单选题")
             for j, q in enumerate(chapter_data["single_choice"]):
-                render_question(q, "单选题", j, chapter_name, saved_answers)
+                render_question(q, "单选题", j, chapter_name, saved_answers, api_key)
             
             # 多选题
             st.subheader("📝 多选题")
             for j, q in enumerate(chapter_data["multiple_choice"]):
-                render_question(q, "多选题", j, chapter_name, saved_answers)
+                render_question(q, "多选题", j, chapter_name, saved_answers, api_key)
             
             # 简答题
             st.subheader("📝 简答题")
             for j, q in enumerate(chapter_data["short_answer"]):
-                render_question(q, "简答题", j, chapter_name, saved_answers)
+                render_question(q, "简答题", j, chapter_name, saved_answers, api_key)
             
             # 编程题
             st.subheader("📝 编程题")
             for j, q in enumerate(chapter_data["programming"]):
-                render_question(q, "编程题", j, chapter_name, saved_answers)
+                render_question(q, "编程题", j, chapter_name, saved_answers, api_key)
             
             # 进阶编程题
             if "advanced" in chapter_data and chapter_data["advanced"]:
                 st.subheader("📝 进阶编程题")
                 for j, q in enumerate(chapter_data["advanced"]):
-                    render_question(q, "进阶编程题", j, chapter_name, saved_answers)
+                    render_question(q, "进阶编程题", j, chapter_name, saved_answers, api_key)
 
 if __name__ == "__main__":
     main()
