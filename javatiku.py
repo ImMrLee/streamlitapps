@@ -338,7 +338,7 @@ def call_ai_api(api_key, question, answer, model="mimo-v1"):
     try:
         import requests
         
-        url = "https://api.xiaomimimo.com/v1"  # 假设的API端点，请根据实际调整
+        url = "https://api.xiaomimimo.com/v1/chat/completions"  # 假设的API端点，请根据实际调整
         
         headers = {
             "Authorization": f"Bearer {api_key}",
