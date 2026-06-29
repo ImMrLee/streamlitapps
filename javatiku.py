@@ -344,17 +344,22 @@ def call_ai_api(api_key, question, answer, model="mimo-v2-flash"):
             "Content-Type": "application/json"
         }
         
-        prompt = f"""请详细解析这道Java题目，并解释正确答案的原因：
-
-题目：{question}
-
-正确答案：{answer}
-
-请从以下几个方面进行解析：
+        prompt = f"请简单解析这道Java题目，并解释正确答案的原因：\n\n题目：{question}\n"
+        
+        # 2. 如果有选项，则添加选项部分（仅选择题）
+        if options:
+            options_text = "\n".join(options)  # 将选项列表转换为多行文本
+            prompt += f"选项：\n{options_text}\n"
+        
+        # 3. 添加正确答案
+        prompt += f"正确答案：{answer}\n\n"
+        
+        # 4. 添加解析要求
+        prompt += """请从以下几个方面进行解析：
 1. 题目考察的知识点
-2. 每个选项的分析
+2. 每个选项的分析（如果有选项的话）
 3. 为什么正确答案是正确的
-4. 相关的扩展知识点（如果有）
+4. 要求内容简洁，不冗长
 
 请用中文回答，保持专业且易懂。"""
 
@@ -399,7 +404,20 @@ def render_question(question, q_type, q_index, chapter, saved_answers, api_key):
         # AI解析按钮
         if st.button(f"🤖 AI解析", key=f"ai_{chapter}_{q_type}_{q_index}"):
             with st.spinner("正在调用AI模型解析..."):
-                analysis = call_ai_api(api_key, question['question'], question['answer'])
+                # 根据题目类型决定是否传递 options
+                if q_type in ["单选题", "多选题"] and "options" in question:
+                    # 选择题：传递选项列表
+                    analysis = call_ai_api(
+                        question=question['question'],
+                        answer=question['answer'],
+                        options=question['options']  # 传递选项列表
+                    )
+                else:
+                    # 简答题、编程题：不传递 options
+                    analysis = call_ai_api(
+                        question=question['question'],
+                        answer=question['answer']
+                    )
                 st.markdown(f"<div class='ai-analysis'><strong>🧠 AI解析：</strong><br>{analysis}</div>", unsafe_allow_html=True)
     
     # 简答题和编程题显示解答框
