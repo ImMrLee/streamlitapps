@@ -330,7 +330,7 @@ def load_saved_answers(chapter):
     return {}
 
 # AI解析功能（小米Mimo模型）
-def call_ai_api(api_key, question, answer, model="mimo-v1"):
+def call_ai_api(api_key, question, answer, model="mimo-v2-flash"):
     """调用AI模型解析题目"""
     if not api_key:
         return "请先在侧边栏配置API Key"
