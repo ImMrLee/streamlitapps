@@ -330,31 +330,38 @@ def load_saved_answers(chapter):
     return {}
 
 # AI解析功能（小米Mimo模型）
-def call_ai_api(api_key, question, answer, model="mimo-v2-flash"):
-    """调用AI模型解析题目"""
+def call_ai_api(question, answer, options=None, model="mimo-v2-flash"):
+    """调用AI模型解析题目
+    question: 题目内容
+    answer: 正确答案
+    options: 选项列表（仅选择题有），默认为None
+    model: 模型名称
+    """
+    # 直接嵌入API Key
     api_key = "sk-crwl9fq9mkfdob19dznss9c8zdoyv4fz0a8gqftbvhg23j8c"
     
     try:
         import requests
         
-        url = "https://api.xiaomimimo.com/v1/chat/completions"  # 假设的API端点，请根据实际调整
+        url = "https://api.xiaomimimo.com/v1/chat/completions"
         
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         
+        # 动态构建prompt
         prompt = f"请简单解析这道Java题目，并解释正确答案的原因：\n\n题目：{question}\n"
         
-        # 2. 如果有选项，则添加选项部分（仅选择题）
+        # 如果有选项，则添加选项部分（仅选择题）
         if options:
             options_text = "\n".join(options)  # 将选项列表转换为多行文本
             prompt += f"选项：\n{options_text}\n"
         
-        # 3. 添加正确答案
+        # 添加正确答案
         prompt += f"正确答案：{answer}\n\n"
         
-        # 4. 添加解析要求
+        # 添加解析要求
         prompt += """请从以下几个方面进行解析：
 1. 题目考察的知识点
 2. 每个选项的分析（如果有选项的话）
@@ -388,7 +395,7 @@ def call_ai_api(api_key, question, answer, model="mimo-v2-flash"):
         return f"发生错误: {str(e)}"
 
 # 渲染题目
-def render_question(question, q_type, q_index, chapter, saved_answers, api_key):
+def render_question(question, q_type, q_index, chapter, saved_answers):  # ← 移除 api_key 参数
     col1, col2 = st.columns([9, 1])
     with col1:
         st.markdown(f"**{q_type} {q_index+1}.** {question['question']}")
@@ -406,14 +413,12 @@ def render_question(question, q_type, q_index, chapter, saved_answers, api_key):
             with st.spinner("正在调用AI模型解析..."):
                 # 根据题目类型决定是否传递 options
                 if q_type in ["单选题", "多选题"] and "options" in question:
-                    # 选择题：传递选项列表
                     analysis = call_ai_api(
                         question=question['question'],
                         answer=question['answer'],
-                        options=question['options']  # 传递选项列表
+                        options=question['options']
                     )
                 else:
-                    # 简答题、编程题：不传递 options
                     analysis = call_ai_api(
                         question=question['question'],
                         answer=question['answer']
@@ -425,7 +430,6 @@ def render_question(question, q_type, q_index, chapter, saved_answers, api_key):
         key = f"answer_{chapter}_{q_type}_{question['id']}"
         saved_value = saved_answers.get(f"{q_type}_{question['id']}", "")
         
-        # 使用HTML禁止粘贴
         st.text_area(
             "✏️ 输入你的答案",
             value=saved_value,
@@ -434,7 +438,6 @@ def render_question(question, q_type, q_index, chapter, saved_answers, api_key):
             help="请在此输入你的答案（禁止粘贴）"
         )
         
-        # 保存按钮
         if st.button(f"💾 保存答案", key=f"save_{chapter}_{q_type}_{question['id']}"):
             answer_text = st.session_state.get(key, "")
             if save_answer(chapter, q_type, question['id'], answer_text):
