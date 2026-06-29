@@ -450,15 +450,6 @@ def render_question(question, q_type, q_index, chapter, saved_answers):
         # 显示选项列表（保留原有显示）
         for opt in question["options"]:
             st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;{opt}")
-        
-        # 判断是否正确
-        if user_selected:
-            correct_answer = question['answer'].replace(" ", "")  # 移除空格，如 "A B C" -> "ABC"
-            is_correct = user_selected == correct_answer
-            if is_correct:
-                st.success("✅ 回答正确！")
-            else:
-                st.error(f"❌ 回答错误，正确答案是：{question['answer']}")
     
     else:
         # 非选择题：只显示题目内容（原有逻辑）
