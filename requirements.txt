@@ -1,1 +1,2 @@
 plotly
+#神奇，在这里添加requirements后，可以解决云部署的依赖模块缺失问题
