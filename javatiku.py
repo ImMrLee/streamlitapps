@@ -296,7 +296,7 @@ def load_saved_answers(chapter):
     return {}
 
 # AI解析功能（小米Mimo模型）
-def call_ai_api(question, answer, options=None, model="mimo-v2-flash"):
+def call_ai_api(question, answer, options=None, model="mimo-v2.5"):
     """调用AI模型解析题目
     question: 题目内容
     answer: 正确答案
