@@ -455,29 +455,143 @@ def render_question(question, q_type, q_index, chapter, saved_answers):
                         answer=question['answer']
                     )
                 st.markdown(f"<div class='ai-analysis'><strong>🧠 AI解析：</strong><br>{analysis}</div>", unsafe_allow_html=True)
-    
-    # 简答题和编程题显示解答框（保持不变）
     if q_type in ["简答题", "编程题", "进阶编程题"]:
         key = f"answer_{chapter}_{q_type}_{question['id']}"
         saved_value = saved_answers.get(f"{q_type}_{question['id']}", "")
         
-        st.text_area(
-            "输入你的答案",
+        # 用户答案输入框
+        user_answer = st.text_area(
+            "✏️ 输入你的答案",
             value=saved_value,
             key=key,
             height=150 if q_type == "简答题" else 250,
             help="请在此输入你的答案（禁止粘贴）"
         )
         
-        if st.button(f"保存答案", key=f"save_{chapter}_{q_type}_{question['id']}"):
-            answer_text = st.session_state.get(key, "")
-            if save_answer(chapter, q_type, question['id'], answer_text):
-                st.success("答案已保存！")
-            else:
-                st.error("保存失败")
+        col_save, col_score = st.columns(2)
+        
+        with col_save:
+            if st.button(f"💾 保存答案", key=f"save_{chapter}_{q_type}_{question['id']}"):
+                if save_answer(chapter, q_type, question['id'], user_answer):
+                    st.success("✅ 答案已保存！")
+                else:
+                    st.error("❌ 保存失败")
+        
+        with col_score:
+            # AI打分按钮：只有在用户已输入答案时才启用
+            if st.button(f"🎯 AI打分 (10分制)", key=f"score_{chapter}_{q_type}_{question['id']}"):
+                if not user_answer or user_answer.strip() == "":
+                    st.warning("⚠️ 请先输入你的答案再打分！")
+                else:
+                    with st.spinner("AI正在评判你的答案..."):
+                        score_result = call_ai_scoring(
+                            question=question['question'],
+                            user_answer=user_answer,
+                            reference_answer=question['answer'],
+                            q_type=q_type
+                        )
+                        st.markdown(f"<div class='ai-analysis'><strong>📊 AI评分结果：</strong><br>{score_result}</div>", unsafe_allow_html=True)
     
     st.divider()
 
+def call_ai_scoring(question, user_answer, reference_answer, q_type, model="mimo-v2.5"):
+    """调用AI模型对用户答案进行打分和评价
+    question: 题目内容
+    user_answer: 用户输入的答案
+    reference_answer: 参考答案
+    q_type: 题目类型（简答题/编程题）
+    model: 模型名称
+    """
+    api_key = "sk-crwl9fq9mkfdob19dznss9c8zdoyv4fz0a8gqftbvhg23j8c"
+    
+    try:
+        import requests
+        
+        url = "https://api.xiaomimimo.com/v1/chat/completions"
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # 根据题目类型构建不同的评分提示
+        if q_type == "编程题" or q_type == "进阶编程题":
+            prompt = f"""你是一位专业的Java编程考官，请对用户的代码答案进行评分（满分10分）。
+
+    题目要求：
+    {question}
+
+    参考答案：
+    {reference_answer}
+
+    用户的答案：
+    {user_answer}
+
+    请从以下维度进行评分：
+    1. 代码正确性（能否正确实现功能）
+    2. 代码规范性和可读性
+    3. 逻辑清晰度
+    4. 与参考答案的契合度
+
+    请按以下格式输出评分结果：
+    📊 得分：X/10分
+
+    📝 评分理由：
+    （详细说明扣分和得分点）
+
+    💡 改进建议：
+    （具体的改进方向）"""
+        else:
+            # 简答题
+            prompt = f"""你是一位专业的Java考官，请对用户的答案进行评分（满分10分）。
+
+    题目：
+    {question}
+
+    参考答案：
+    {reference_answer}
+
+    用户的答案：
+    {user_answer}
+
+    请从以下维度进行评分：
+    1. 关键知识点是否答全
+    2. 表述是否准确清晰
+    3. 逻辑是否完整
+    4. 与参考答案的契合度
+
+    请按以下格式输出评分结果：
+    📊 得分：X/10分
+
+    📝 评分理由：
+    （详细说明扣分和得分点）
+
+    💡 改进建议：
+    （具体的改进方向）"""
+
+        data = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "你是一位严格的Java编程考官，评分公正客观，反馈清晰具体。"},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7,  # 降低温度，让评分更稳定一致
+            "max_tokens": 2048
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response.raise_for_status()
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+        
+    except ImportError:
+        return "请安装requests库: pip install requests"
+    except requests.exceptions.Timeout:
+        return "请求超时，请检查网络连接"
+    except requests.exceptions.RequestException as e:
+        return f"评分请求失败: {str(e)}"
+    except Exception as e:
+        return f"发生错误: {str(e)}"
 # 主程序
 def main():
     st.title("Java 题库系统")
