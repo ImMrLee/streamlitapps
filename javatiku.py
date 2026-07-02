@@ -14,26 +14,6 @@ st.set_page_config(
 # 自定义CSS防止文本选中和复制
 st.markdown("""
 <style>
-    /* 防止文本被选中 */
-    * {
-        user-select: none !important;
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-    }
-    
-    /* 允许输入框内选中，但禁止粘贴 */
-    textarea, input {
-        user-select: text !important;
-        -webkit-user-select: text !important;
-        -moz-user-select: text !important;
-        -ms-user-select: text !important;
-    }
-    
-    /* 禁止粘贴 */
-    textarea, input {
-        -webkit-user-modify: read-write-plaintext-only;
-    }
     
     /* 自定义按钮样式 */
     .stButton > button {
@@ -94,20 +74,6 @@ st.markdown("""
     }
 </style>
 
-<script>
-    // 阻止粘贴事件
-    document.addEventListener('paste', function(e) {
-        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-            e.preventDefault();
-            alert('禁止粘贴内容，请手动输入！');
-        }
-    });
-    
-    // 阻止右键菜单
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
-</script>
 """, unsafe_allow_html=True)
 
 # 题库数据
@@ -376,7 +342,7 @@ def call_ai_api(question, answer, options=None, model="mimo-v2-flash"):
                 {"role": "system", "content": "你是一位专业的Java编程教育专家，擅长用清晰简洁的方式解释编程概念。"},
                 {"role": "user", "content": prompt}
             ],
-            "temperature": 0.7,
+            "temperature": 0.9,
             "max_tokens": 2048
         }
         
