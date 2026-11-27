@@ -150,8 +150,7 @@ def _reset():
 # ----------------------------------------------------------------------------
 st.title("零宽字符注入器")
 st.caption(
-    f"每个名字的字与字之间插入一个 U+2060（WORD JOINER）　·　"
-    "零宽不可见、不产生换行点　·　纯本地计算，内容不上传"
+    f"每个名字的字与字之间插入一个不可见但实际存在的空格，可以避免被审查关键词"
 )
 
 names_raw = st.text_area(
@@ -164,7 +163,6 @@ names_raw = st.text_area(
 c1, c2, c3 = st.columns([1, 1, 2.6])
 gen = c1.button("生成", type="primary", use_container_width=True)
 c2.button("清空", use_container_width=True, on_click=_reset)
-c3.caption("单字名无法插入，会原样保留。")
 
 if gen:
     lines = split_names(ss["names_input"])
