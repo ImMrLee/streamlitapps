@@ -183,9 +183,6 @@ if gen:
         ss["odd"] = odd
 
 if ss["result"]:
-    m1, m2 = st.columns(2)
-    m1.metric("名字个数", ss["count"])
-    m2.metric("插入字符", ss["zw_count"])
 
     if ss["odd"]:
         st.warning("以下名字不足 2 字，未做处理：" + "、".join(ss["odd"]))
